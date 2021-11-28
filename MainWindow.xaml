@@ -1,0 +1,160 @@
+﻿<Window x:Class="GrafikaKomputerowa3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:GrafikaKomputerowa3"
+        mc:Ignorable="d"
+        Title="Image filtering with matrix filters and histograms preview - Konrad Brzózka"
+        Height="800" Width="1200" MinHeight="650" MinWidth="650">
+    <Window.Resources>
+        <Style x:Key="NumericBox" TargetType="xctk:DoubleUpDown">
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="Value" Value="1.00" />
+            <Setter Property="FormatString" Value="F2" />
+            <Setter Property="Increment" Value=".1" />
+        </Style>
+        <Style x:Key="HistogramImage" TargetType="Image">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Width" Value="200" />
+            <Setter Property="Height" Value="200" />
+        </Style>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </Window.Resources>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..." />
+                <MenuItem Header="_Save..." />
+                <Separator />
+                <MenuItem Header="E_xit" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_View help" />
+                <MenuItem Header="_About" />
+            </MenuItem>
+        </Menu>
+        <Grid Margin="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="225" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Filtering" Grid.Column="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <GroupBox Grid.Row="0" Header="Brush">
+                        <StackPanel Margin="8" x:Name="BrushTypesPanel">
+                            <RadioButton x:Name="WholeImageBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center">
+                                <Label Content="Whole image" />
+                            </RadioButton>
+                            <RadioButton x:Name="CircularBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center" IsChecked="True">
+                                <Label Content="Circular" />
+                            </RadioButton>
+                            <Grid Margin="16,0,0,0" IsEnabled="{Binding ElementName=CircularBrushRadio, Path=IsChecked, UpdateSourceTrigger=PropertyChanged}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Slider x:Name="CircularBrushRadiusSlider" Grid.Column="0" VerticalAlignment="Center"
+                                    TickFrequency="1" IsSnapToTickEnabled="True" Minimum="1" Maximum="360" Value="32" />
+                                <Label Content="{Binding ElementName=CircularBrushRadiusSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                   Grid.Column="1" MinWidth="30" HorizontalContentAlignment="Center" />
+                            </Grid>
+                            <RadioButton x:Name="PolygonBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center">
+                                <Label Content="Polygon" />
+                            </RadioButton>
+                            <Button x:Name="ClearPolygonBrushButton" IsEnabled="{Binding ElementName=PolygonBrushRadio, Path=IsChecked, UpdateSourceTrigger=PropertyChanged}"
+                                Content="Clear" HorizontalAlignment="Right" MinWidth="60" />
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Grid.Row="1" Header="Filter">
+                        <StackPanel x:Name="FiltersPanel" Margin="8">
+                            <RadioButton x:Name="IdentityFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                                <Label Content="Identity" />
+                            </RadioButton>
+                            <RadioButton x:Name="BlurFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center" IsChecked="True">
+                                <Label Content="Blur" />
+                            </RadioButton>
+                            <RadioButton x:Name="SharpenFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                                <Label Content="Sharpen" />
+                            </RadioButton>
+                            <RadioButton x:Name="ReliefFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                                <Label Content="Relief" />
+                            </RadioButton>
+                            <RadioButton x:Name="EdgeDetectionFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                                <Label Content="Edge detection" />
+                            </RadioButton>
+                            <RadioButton x:Name="CustomFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                                <Label Content="Custom:" />
+                            </RadioButton>
+                            <UniformGrid x:Name="CustomFilterPanel" Columns="3" Rows="3" Margin="16,0,0,0"
+                                     IsEnabled="{Binding ElementName=CustomFilterRadio, Path=IsChecked, UpdateSourceTrigger=PropertyChanged}">
+                                <xctk:DoubleUpDown x:Name="CustomFilterABox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterBBox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterCBox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterDBox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterEBox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterFBox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterGBox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterHBox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterIBox" Style="{StaticResource NumericBox}" />
+                            </UniformGrid>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Header="Properties">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*" />
+                                    <RowDefinition Height="1*" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Column="1" Grid.Row="0" Content="Offset" />
+                                <xctk:DoubleUpDown Grid.Column="2" Grid.Row="0" x:Name="FilterOffsetBox" Margin="2"
+                                               Value="0.00" FormatString="F4" />
+
+                                <CheckBox Grid.Column="0" Grid.Row="1" x:Name="FilterAutoFactorCheckBox" VerticalAlignment="Center" IsChecked="True"
+                                          ToolTip="Automatically determine factor" ToolTipService.InitialShowDelay="300" />
+                                <Label Grid.Column="1" Grid.Row="1" Content="Factor"
+                                   IsEnabled="{Binding ElementName=FilterAutoFactorCheckBox, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
+                                <xctk:DoubleUpDown Grid.Column="2" Grid.Row="1" x:Name="FilterFactorBox" Margin="2"
+                                               IsEnabled="{Binding ElementName=FilterAutoFactorCheckBox, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                                               Value="1.00" FormatString="F4" />
+                            </Grid>
+                        </StackPanel>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Histograms" Grid.Column="1">
+                <StackPanel>
+                    <Image x:Name="HistogramRedImage" Style="{StaticResource HistogramImage}" />
+                    <Image x:Name="HistogramGreenImage" Style="{StaticResource HistogramImage}" />
+                    <Image x:Name="HistogramBlueImage" Style="{StaticResource HistogramImage}" />
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Image preview" Grid.Column="2">
+                <ScrollViewer
+                          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Label Content="Select an image..."
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Image Visibility="Hidden" Stretch="None" />
+                    </Grid>
+                </ScrollViewer>
+            </GroupBox>
+        </Grid>
+    </DockPanel>
+</Window>
