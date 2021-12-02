@@ -7,7 +7,8 @@
         xmlns:local="clr-namespace:GrafikaKomputerowa3"
         mc:Ignorable="d"
         Title="Image filtering with matrix filters and histograms preview - Konrad Brzózka"
-        Height="800" Width="1200" MinHeight="650" MinWidth="650">
+        Height="800" Width="1200" MinHeight="650" MinWidth="650"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
         <Style x:Key="NumericBox" TargetType="xctk:DoubleUpDown">
             <Setter Property="Margin" Value="1" />
@@ -65,7 +66,8 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Slider x:Name="CircularBrushRadiusSlider" Grid.Column="0" VerticalAlignment="Center"
-                                    TickFrequency="1" IsSnapToTickEnabled="True" Minimum="1" Maximum="360" Value="32" />
+                                    TickFrequency="1" IsSnapToTickEnabled="True" Minimum="1" Maximum="360" Value="32"
+                                    ValueChanged="CircularBrushRadiusSlider_ValueChanged" />
                                 <Label Content="{Binding ElementName=CircularBrushRadiusSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"
                                    Grid.Column="1" MinWidth="30" HorizontalContentAlignment="Center" />
                             </Grid>
@@ -152,6 +154,12 @@
                         <Label Content="Select an image..."
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Image Visibility="Hidden" Stretch="None" />
+                        <Canvas x:Name="ImageCanvas" Background="Transparent"
+                                MouseEnter="ImageCanvas_MouseEnter"
+                                MouseLeave="ImageCanvas_MouseLeave"
+                                MouseDown="ImageCanvas_MouseDown"
+                                MouseUp="ImageCanvas_MouseUp"
+                                MouseMove="ImageCanvas_MouseMove" />
                     </Grid>
                 </ScrollViewer>
             </GroupBox>
