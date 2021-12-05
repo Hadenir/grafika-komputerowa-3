@@ -19,7 +19,7 @@
         </Style>
         <Style x:Key="HistogramImage" TargetType="Image">
             <Setter Property="Margin" Value="4" />
-            <Setter Property="Width" Value="200" />
+            <Setter Property="Width" Value="256" />
             <Setter Property="Height" Value="200" />
         </Style>
         <local:InverseBooleanConverter x:Key="InverseBooleanConverter" />
@@ -28,20 +28,15 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open..." />
-                <MenuItem Header="_Save..." />
+                <MenuItem Header="_Open..." x:Name="OpenMenu" Click="OpenMenu_Click" />
                 <Separator />
-                <MenuItem Header="E_xit" />
-            </MenuItem>
-            <MenuItem Header="_Help">
-                <MenuItem Header="_View help" />
-                <MenuItem Header="_About" />
+                <MenuItem Header="E_xit" x:Name="ExitMenu" />
             </MenuItem>
         </Menu>
         <Grid Margin="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250" />
-                <ColumnDefinition Width="225" />
+                <ColumnDefinition Width="280" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <GroupBox Header="Filtering" Grid.Column="0">
@@ -54,10 +49,10 @@
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Brush">
                         <StackPanel Margin="8" x:Name="BrushTypesPanel">
-                            <RadioButton x:Name="WholeImageBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center">
+                            <RadioButton x:Name="WholeImageBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center" Click="BrushRadio_Click">
                                 <Label Content="Whole image" />
                             </RadioButton>
-                            <RadioButton x:Name="CircularBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center" IsChecked="True">
+                            <RadioButton x:Name="CircularBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center" IsChecked="True" Click="BrushRadio_Click">
                                 <Label Content="Circular" />
                             </RadioButton>
                             <Grid Margin="16,0,0,0" IsEnabled="{Binding ElementName=CircularBrushRadio, Path=IsChecked, UpdateSourceTrigger=PropertyChanged}">
@@ -71,44 +66,44 @@
                                 <Label Content="{Binding ElementName=CircularBrushRadiusSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"
                                    Grid.Column="1" MinWidth="30" HorizontalContentAlignment="Center" />
                             </Grid>
-                            <RadioButton x:Name="PolygonBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center">
+                            <!--<RadioButton x:Name="PolygonBrushRadio" GroupName="BrushType" VerticalContentAlignment="Center">
                                 <Label Content="Polygon" />
                             </RadioButton>
                             <Button x:Name="ClearPolygonBrushButton" IsEnabled="{Binding ElementName=PolygonBrushRadio, Path=IsChecked, UpdateSourceTrigger=PropertyChanged}"
-                                Content="Clear" HorizontalAlignment="Right" MinWidth="60" />
+                                Content="Clear" HorizontalAlignment="Right" MinWidth="60" />-->
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Header="Filter">
                         <StackPanel x:Name="FiltersPanel" Margin="8">
-                            <RadioButton x:Name="IdentityFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                            <RadioButton x:Name="IdentityFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center" IsChecked="True" Click="FilterRadio_Click">
                                 <Label Content="Identity" />
                             </RadioButton>
-                            <RadioButton x:Name="BlurFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center" IsChecked="True">
+                            <RadioButton x:Name="BlurFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center" Click="FilterRadio_Click">
                                 <Label Content="Blur" />
                             </RadioButton>
-                            <RadioButton x:Name="SharpenFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                            <RadioButton x:Name="SharpenFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center" Click="FilterRadio_Click">
                                 <Label Content="Sharpen" />
                             </RadioButton>
-                            <RadioButton x:Name="ReliefFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                            <RadioButton x:Name="ReliefFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center" Click="FilterRadio_Click">
                                 <Label Content="Relief" />
                             </RadioButton>
-                            <RadioButton x:Name="EdgeDetectionFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                            <RadioButton x:Name="EdgeDetectionFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center" Click="FilterRadio_Click">
                                 <Label Content="Edge detection" />
                             </RadioButton>
-                            <RadioButton x:Name="CustomFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center">
+                            <RadioButton x:Name="CustomFilterRadio" GroupName="FilterType" VerticalContentAlignment="Center" Click="FilterRadio_Click">
                                 <Label Content="Custom:" />
                             </RadioButton>
                             <UniformGrid x:Name="CustomFilterPanel" Columns="3" Rows="3" Margin="16,0,0,0"
                                      IsEnabled="{Binding ElementName=CustomFilterRadio, Path=IsChecked, UpdateSourceTrigger=PropertyChanged}">
-                                <xctk:DoubleUpDown x:Name="CustomFilterABox" Style="{StaticResource NumericBox}" />
-                                <xctk:DoubleUpDown x:Name="CustomFilterBBox" Style="{StaticResource NumericBox}" />
-                                <xctk:DoubleUpDown x:Name="CustomFilterCBox" Style="{StaticResource NumericBox}" />
-                                <xctk:DoubleUpDown x:Name="CustomFilterDBox" Style="{StaticResource NumericBox}" />
-                                <xctk:DoubleUpDown x:Name="CustomFilterEBox" Style="{StaticResource NumericBox}" />
-                                <xctk:DoubleUpDown x:Name="CustomFilterFBox" Style="{StaticResource NumericBox}" />
-                                <xctk:DoubleUpDown x:Name="CustomFilterGBox" Style="{StaticResource NumericBox}" />
-                                <xctk:DoubleUpDown x:Name="CustomFilterHBox" Style="{StaticResource NumericBox}" />
-                                <xctk:DoubleUpDown x:Name="CustomFilterIBox" Style="{StaticResource NumericBox}" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterABox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterBBox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterCBox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterDBox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterEBox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterFBox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterGBox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterHBox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
+                                <xctk:DoubleUpDown x:Name="CustomFilterIBox" Style="{StaticResource NumericBox}" ValueChanged="CustomFilter_ValueChanged" />
                             </UniformGrid>
                         </StackPanel>
                     </GroupBox>
@@ -126,7 +121,7 @@
                                 </Grid.RowDefinitions>
                                 <Label Grid.Column="1" Grid.Row="0" Content="Offset" />
                                 <xctk:DoubleUpDown Grid.Column="2" Grid.Row="0" x:Name="FilterOffsetBox" Margin="2"
-                                               Value="0.00" FormatString="F4" />
+                                               Value="0.00" FormatString="F4" ValueChanged="FilterOffsetBox_ValueChanged" />
 
                                 <CheckBox Grid.Column="0" Grid.Row="1" x:Name="FilterAutoFactorCheckBox" VerticalAlignment="Center" IsChecked="True"
                                           ToolTip="Automatically determine factor" ToolTipService.InitialShowDelay="300" />
@@ -134,7 +129,7 @@
                                    IsEnabled="{Binding ElementName=FilterAutoFactorCheckBox, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
                                 <xctk:DoubleUpDown Grid.Column="2" Grid.Row="1" x:Name="FilterFactorBox" Margin="2"
                                                IsEnabled="{Binding ElementName=FilterAutoFactorCheckBox, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
-                                               Value="1.00" FormatString="F4" />
+                                               Value="1.00" FormatString="F4" ValueChanged="FilterFactorBox_ValueChanged" />
                             </Grid>
                         </StackPanel>
                     </GroupBox>
@@ -153,13 +148,15 @@
                     <Grid>
                         <Label Content="Select an image..."
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        <Image Visibility="Hidden" Stretch="None" />
+                        <Image x:Name="Image" Stretch="None" />
                         <Canvas x:Name="ImageCanvas" Background="Transparent"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                 MouseEnter="ImageCanvas_MouseEnter"
                                 MouseLeave="ImageCanvas_MouseLeave"
                                 MouseDown="ImageCanvas_MouseDown"
                                 MouseUp="ImageCanvas_MouseUp"
-                                MouseMove="ImageCanvas_MouseMove" />
+                                MouseMove="ImageCanvas_MouseMove">
+                        </Canvas>
                     </Grid>
                 </ScrollViewer>
             </GroupBox>

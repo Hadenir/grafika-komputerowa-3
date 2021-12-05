@@ -1,36 +1,20 @@
 ﻿using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace GrafikaKomputerowa3.Filters
 {
     public interface IFilter
     {
-        void ApplyFilter(Point point);
+        float[] Matrix { get; }
+        float Offset { get; set; }
+        float? Factor { get; set; }
+        WriteableBitmap? SourceBitmap { get; set; }
+        WriteableBitmap? TargetBitmap { get; set; }
 
-        byte[] GetFilteredBuffer();
+        void Lock();
 
-        void SwapBuffer();
-    }
+        void Unlock(int x, int y, int w, int h);
 
-    public abstract class FilterBase : IFilter
-    {
-        protected byte[] sourceBuffer;
-        protected byte[] targetBuffer;
-
-        protected FilterBase(byte[] buffer)
-        {
-            sourceBuffer = buffer;
-            targetBuffer = new byte[buffer.Length];
-            sourceBuffer.CopyTo(targetBuffer, 0);
-        }
-
-        public abstract void ApplyFilter(Point point);
-
-        public byte[] GetFilteredBuffer() => targetBuffer;
-
-        public void SwapBuffer()
-        {
-            (targetBuffer, sourceBuffer) = (sourceBuffer, targetBuffer);
-            sourceBuffer.CopyTo(targetBuffer, 0);
-        }
+        void ApplyFilter(int x, int y);
     }
 }
