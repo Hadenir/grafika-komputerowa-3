@@ -124,7 +124,8 @@
                                                Value="0.00" FormatString="F4" ValueChanged="FilterOffsetBox_ValueChanged" />
 
                                 <CheckBox Grid.Column="0" Grid.Row="1" x:Name="FilterAutoFactorCheckBox" VerticalAlignment="Center" IsChecked="True"
-                                          ToolTip="Automatically determine factor" ToolTipService.InitialShowDelay="300" />
+                                          ToolTip="Automatically determine factor" ToolTipService.InitialShowDelay="300"
+                                          Checked="FilterAutoFactorCheckBox_Changed" Unchecked="FilterAutoFactorCheckBox_Changed" />
                                 <Label Grid.Column="1" Grid.Row="1" Content="Factor"
                                    IsEnabled="{Binding ElementName=FilterAutoFactorCheckBox, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
                                 <xctk:DoubleUpDown Grid.Column="2" Grid.Row="1" x:Name="FilterFactorBox" Margin="2"
@@ -150,7 +151,6 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Image x:Name="Image" Stretch="None" />
                         <Canvas x:Name="ImageCanvas" Background="Transparent"
-                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                 MouseEnter="ImageCanvas_MouseEnter"
                                 MouseLeave="ImageCanvas_MouseLeave"
                                 MouseDown="ImageCanvas_MouseDown"

@@ -21,11 +21,12 @@ namespace GrafikaKomputerowa3
 
         public MainWindow()
         {
+            CurrentBrush = new CircularBrush { Radius = 32 };
+            CurrentFilter = new MatrixFilter();
+
             InitializeComponent();
 
-            CurrentBrush = new CircularBrush { Radius = 32 };
             ImageCanvas.Children.Add(CurrentBrush.Tool);
-            CurrentFilter = new MatrixFilter();
         }
 
         private Point GetCanvasMousePosition() => Mouse.GetPosition(ImageCanvas);
@@ -112,15 +113,15 @@ namespace GrafikaKomputerowa3
             }
             else if (sender == BlurFilterRadio)
             {
-                CurrentFilter.Matrix[0] = 0;
-                CurrentFilter.Matrix[1] = 1;
-                CurrentFilter.Matrix[2] = 0;
-                CurrentFilter.Matrix[3] = 1;
+                CurrentFilter.Matrix[0] = 1;
+                CurrentFilter.Matrix[1] = 2;
+                CurrentFilter.Matrix[2] = 1;
+                CurrentFilter.Matrix[3] = 2;
                 CurrentFilter.Matrix[4] = 4;
-                CurrentFilter.Matrix[5] = 1;
-                CurrentFilter.Matrix[6] = 0;
-                CurrentFilter.Matrix[7] = 1;
-                CurrentFilter.Matrix[8] = 0;
+                CurrentFilter.Matrix[5] = 2;
+                CurrentFilter.Matrix[6] = 1;
+                CurrentFilter.Matrix[7] = 2;
+                CurrentFilter.Matrix[8] = 1;
             }
             else if (sender == SharpenFilterRadio)
             {
@@ -205,13 +206,22 @@ namespace GrafikaKomputerowa3
 
         private void FilterOffsetBox_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            CurrentFilter.Offset = (float)e.NewValue;
+            CurrentFilter.Offset = Convert.ToSingle(e.NewValue);
             e.Handled = true;
         }
 
         private void FilterFactorBox_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            CurrentFilter.Factor = (float)e.NewValue;
+            if (FilterAutoFactorCheckBox.IsChecked != false) return;
+
+            CurrentFilter.Factor = Convert.ToSingle(e.NewValue);
+            e.Handled = true;
+        }
+
+        private void FilterAutoFactorCheckBox_Changed(object sender, RoutedEventArgs e)
+        {
+            if (FilterAutoFactorCheckBox.IsChecked != true) CurrentFilter.Factor = Convert.ToSingle(FilterFactorBox?.Value);
+            else CurrentFilter.Factor = null;
             e.Handled = true;
         }
     }
