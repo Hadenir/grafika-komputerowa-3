@@ -2,7 +2,9 @@
 using GrafikaKomputerowa3.Filters;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
@@ -246,6 +248,191 @@ namespace GrafikaKomputerowa3
             if (FilterAutoFactorCheckBox.IsChecked != true) CurrentFilter.Factor = Convert.ToSingle(FilterFactorBox?.Value);
             else CurrentFilter.Factor = null;
             e.Handled = true;
+        }
+
+        private unsafe void ReduceButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentFilter.SourceBitmap is null) return;
+
+            var k = (int)KSlider.Value;
+
+            var bitmap = CurrentFilter.SourceBitmap;
+            var buffer = (int*)bitmap.BackBuffer.ToPointer();
+            var width = bitmap.PixelWidth;
+            var height = bitmap.PixelHeight;
+
+            var ka = k / 8;
+            var kb = k % 8;
+
+            // Calculating popularity of colors.
+            var counts = new Dictionary<int, int>();
+            for (var y = 0; y < height; y++)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    var color = buffer[x + y * width];
+                    if (counts.ContainsKey(color))
+                        counts[color]++;
+                    else
+                        counts.Add(color, 1);
+                }
+            }
+
+            // Choosing mostp popular colors from all 8 quadrants.
+            var colors1 = counts.Where(x => IsInNthQuadrant(x.Key, 0))
+                            .OrderByDescending(x => x.Value)
+                            .Take(ka)
+                            .Select(x => x.Key);
+            var colors2 = counts.Where(x => IsInNthQuadrant(x.Key, 1))
+                            .OrderByDescending(x => x.Value)
+                            .Take(ka)
+                            .Select(x => x.Key);
+            var colors3 = counts.Where(x => IsInNthQuadrant(x.Key, 2))
+                            .OrderByDescending(x => x.Value)
+                            .Take(ka)
+                            .Select(x => x.Key);
+            var colors4 = counts.Where(x => IsInNthQuadrant(x.Key, 3))
+                            .OrderByDescending(x => x.Value)
+                            .Take(ka)
+                            .Select(x => x.Key);
+            var colors5 = counts.Where(x => IsInNthQuadrant(x.Key, 4))
+                            .OrderByDescending(x => x.Value)
+                            .Take(ka)
+                            .Select(x => x.Key);
+            var colors6 = counts.Where(x => IsInNthQuadrant(x.Key, 5))
+                            .OrderByDescending(x => x.Value)
+                            .Take(ka)
+                            .Select(x => x.Key);
+            var colors7 = counts.Where(x => IsInNthQuadrant(x.Key, 6))
+                            .OrderByDescending(x => x.Value)
+                            .Take(ka)
+                            .Select(x => x.Key);
+            var colors8 = counts.Where(x => IsInNthQuadrant(x.Key, 7))
+                            .OrderByDescending(x => x.Value)
+                            .Take(ka + kb)
+                            .Select(x => x.Key);
+
+            // Create the palette of colors.
+            var palette = colors1
+                            .Concat(colors2)
+                            .Concat(colors3)
+                            .Concat(colors4)
+                            .Concat(colors5)
+                            .Concat(colors6)
+                            .Concat(colors7)
+                            .Concat(colors8)
+                            .ToList();
+
+            // Mapping original colors, to the closest ones from the palette.
+            try
+            {
+                bitmap.Lock();
+
+                for (var y = 0; y < height; y++)
+                {
+                    for (var x = 0; x < width; x++)
+                    {
+                        var color = buffer[x + y * width];
+                        var col = palette[0];
+                        var md = Dist(color, col);
+
+                        foreach (var p in palette)
+                        {
+                            var d = Dist(color, p);
+                            if (d < md)
+                            {
+                                col = p;
+                                md = d;
+                            }
+                        }
+
+                        buffer[x + y * width] = col;
+                    }
+                }
+
+                bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
+            }
+            finally
+            {
+                bitmap.Unlock();
+            }
+
+            CurrentFilter.TargetBitmap = bitmap.Clone();
+            Image.Source = CurrentFilter.TargetBitmap;
+
+            var histograms = Histogram.CalculateHistograms(ConvertWriteableBitmapToBitmapImage(bitmap));
+            HistogramRedImage.Source = histograms[0];
+            HistogramGreenImage.Source = histograms[1];
+            HistogramBlueImage.Source = histograms[2];
+
+            e.Handled = true;
+        }
+
+        private bool IsInNthQuadrant(int color, int q)
+        {
+            var r = (color >> 16) & 0xff;
+            var g = (color >> 8) & 0xff;
+            var b = (color >> 0) & 0xff;
+
+            switch (q)
+            {
+                case 0:
+                    return r < 0x80 && g < 0x80 && b < 0x80;
+
+                case 1:
+                    return r >= 0x80 && g < 0x80 && b < 0x80;
+
+                case 2:
+                    return r < 0x80 && g >= 0x80 && b < 0x80;
+
+                case 3:
+                    return r >= 0x80 && g >= 0x80 && b < 0x80;
+
+                case 4:
+                    return r < 0x80 && g < 0x80 && b >= 0x80;
+
+                case 5:
+                    return r >= 0x80 && g < 0x80 && b >= 0x80;
+
+                case 6:
+                    return r < 0x80 && g >= 0x80 && b >= 0x80;
+
+                case 7:
+                    return r >= 0x80 && g >= 0x80 && b >= 0x80;
+
+                default:
+                    throw new Exception("Shouldn't happen!");
+            }
+        }
+
+        private int Dist(int color1, int color2)
+        {
+            var r1 = (color1 >> 16) & 0xff;
+            var g1 = (color1 >> 8) & 0xff;
+            var b1 = (color1 >> 0) & 0xff;
+
+            var r2 = (color2 >> 16) & 0xff;
+            var g2 = (color2 >> 8) & 0xff;
+            var b2 = (color2 >> 0) & 0xff;
+
+            return (r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2);
+        }
+
+        public BitmapImage ConvertWriteableBitmapToBitmapImage(WriteableBitmap wbm)
+        {
+            BitmapImage bmImage = new BitmapImage();
+            using (MemoryStream stream = new MemoryStream())
+            {
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(wbm));
+                encoder.Save(stream);
+                bmImage.BeginInit();
+                bmImage.CacheOption = BitmapCacheOption.OnLoad;
+                bmImage.StreamSource = stream;
+                bmImage.EndInit();
+                bmImage.Freeze();
+            }
+            return bmImage;
         }
     }
 

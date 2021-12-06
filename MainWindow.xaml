@@ -45,6 +45,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Brush">
@@ -132,6 +133,21 @@
                                                IsEnabled="{Binding ElementName=FilterAutoFactorCheckBox, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
                                                Value="1.00" FormatString="F4" ValueChanged="FilterFactorBox_ValueChanged" />
                             </Grid>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Grid.Row="3" Header="Reduction">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Slider x:Name="KSlider" Grid.Column="0" VerticalAlignment="Center"
+                                    TickFrequency="8" IsSnapToTickEnabled="True" Minimum="8" Maximum="200" Value="8" />
+                                <Label Content="{Binding ElementName=KSlider, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                                   Grid.Column="1" MinWidth="30" HorizontalContentAlignment="Center" />
+                            </Grid>
+                            <Button Content="Reduce" x:Name="ReduceButton" Click="ReduceButton_Click" />
                         </StackPanel>
                     </GroupBox>
                 </Grid>
