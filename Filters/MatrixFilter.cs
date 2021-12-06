@@ -25,6 +25,7 @@ namespace GrafikaKomputerowa3.Filters
             var stride = SourceBitmap.Format.BitsPerPixel / 8;
             var idx = (x + y * width) * stride;
             var factor = Factor ?? Matrix.Sum();
+            if (factor == 0) factor = 1;
 
             unsafe
             {

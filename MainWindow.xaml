@@ -120,7 +120,7 @@
                                     <RowDefinition Height="1*" />
                                 </Grid.RowDefinitions>
                                 <Label Grid.Column="1" Grid.Row="0" Content="Offset" />
-                                <xctk:DoubleUpDown Grid.Column="2" Grid.Row="0" x:Name="FilterOffsetBox" Margin="2"
+                                <xctk:DoubleUpDown Grid.Column="2" Grid.Row="0" x:Name="FilterOffsetBox" Margin="2" Increment=".1"
                                                Value="0.00" FormatString="F4" ValueChanged="FilterOffsetBox_ValueChanged" />
 
                                 <CheckBox Grid.Column="0" Grid.Row="1" x:Name="FilterAutoFactorCheckBox" VerticalAlignment="Center" IsChecked="True"
@@ -128,7 +128,7 @@
                                           Checked="FilterAutoFactorCheckBox_Changed" Unchecked="FilterAutoFactorCheckBox_Changed" />
                                 <Label Grid.Column="1" Grid.Row="1" Content="Factor"
                                    IsEnabled="{Binding ElementName=FilterAutoFactorCheckBox, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}" />
-                                <xctk:DoubleUpDown Grid.Column="2" Grid.Row="1" x:Name="FilterFactorBox" Margin="2"
+                                <xctk:DoubleUpDown Grid.Column="2" Grid.Row="1" x:Name="FilterFactorBox" Margin="2" Increment=".1"
                                                IsEnabled="{Binding ElementName=FilterAutoFactorCheckBox, Path=IsChecked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
                                                Value="1.00" FormatString="F4" ValueChanged="FilterFactorBox_ValueChanged" />
                             </Grid>
@@ -146,17 +146,15 @@
             <GroupBox Header="Image preview" Grid.Column="2">
                 <ScrollViewer
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <Grid>
+                    <Grid x:Name="ImageGrid">
                         <Label Content="Select an image..."
                            HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        <Image x:Name="Image" Stretch="None" />
-                        <Canvas x:Name="ImageCanvas" Background="Transparent"
-                                MouseEnter="ImageCanvas_MouseEnter"
-                                MouseLeave="ImageCanvas_MouseLeave"
-                                MouseDown="ImageCanvas_MouseDown"
-                                MouseUp="ImageCanvas_MouseUp"
-                                MouseMove="ImageCanvas_MouseMove">
-                        </Canvas>
+                        <Image x:Name="Image" Stretch="None"
+                               MouseEnter="ImageCanvas_MouseEnter"
+                               MouseLeave="ImageCanvas_MouseLeave"
+                               MouseDown="ImageCanvas_MouseDown"
+                               MouseUp="ImageCanvas_MouseUp"
+                               MouseMove="ImageCanvas_MouseMove" />
                     </Grid>
                 </ScrollViewer>
             </GroupBox>

@@ -26,22 +26,22 @@ namespace GrafikaKomputerowa3
 
             InitializeComponent();
 
-            ImageCanvas.Children.Add(CurrentBrush.Tool);
+            ImageGrid.Children.Add(CurrentBrush.Tool);
         }
 
-        private Point GetCanvasMousePosition() => Mouse.GetPosition(ImageCanvas);
+        private Point GetCanvasMousePosition() => Mouse.GetPosition(Image);
 
         // Event handlers:
 
         private void ImageCanvas_MouseEnter(object sender, MouseEventArgs e)
         {
-            CurrentBrush.Tool.Visibility = Visibility.Visible;
+            //CurrentBrush.Tool.Visibility = Visibility.Visible;
             e.Handled = true;
         }
 
         private void ImageCanvas_MouseLeave(object sender, MouseEventArgs e)
         {
-            CurrentBrush.Tool.Visibility = Visibility.Hidden;
+            //CurrentBrush.Tool.Visibility = Visibility.Hidden;
             e.Handled = true;
         }
 
@@ -171,6 +171,18 @@ namespace GrafikaKomputerowa3
                 CurrentFilter.Matrix[7] = (float)CustomFilterHBox.Value!.Value;
                 CurrentFilter.Matrix[8] = (float)CustomFilterIBox.Value!.Value;
             }
+            else if (sender == CustomFilterRadio)
+            {
+                CurrentFilter.Matrix[0] = (float)CustomFilterABox.Value!.Value;
+                CurrentFilter.Matrix[1] = (float)CustomFilterBBox.Value!.Value;
+                CurrentFilter.Matrix[2] = (float)CustomFilterCBox.Value!.Value;
+                CurrentFilter.Matrix[3] = (float)CustomFilterDBox.Value!.Value;
+                CurrentFilter.Matrix[4] = (float)CustomFilterEBox.Value!.Value;
+                CurrentFilter.Matrix[5] = (float)CustomFilterFBox.Value!.Value;
+                CurrentFilter.Matrix[6] = (float)CustomFilterGBox.Value!.Value;
+                CurrentFilter.Matrix[7] = (float)CustomFilterHBox.Value!.Value;
+                CurrentFilter.Matrix[8] = (float)CustomFilterIBox.Value!.Value;
+            }
 
             e.Handled = true;
         }
@@ -194,11 +206,22 @@ namespace GrafikaKomputerowa3
         {
             if (sender == WholeImageBrushRadio)
             {
+                if (Image.Source is null)
+                {
+                    WholeImageBrushRadio.IsChecked = false;
+                    CircularBrushRadio.IsChecked = true;
+                    return;
+                }
+
+                ImageGrid.Children.Remove(CurrentBrush.Tool);
                 CurrentBrush = new WholeImageBrush((int)Image.Source.Width, (int)Image.Source.Height);
+                ImageGrid.Children.Add(CurrentBrush.Tool);
             }
             else if (sender == CircularBrushRadio)
             {
+                ImageGrid.Children.Remove(CurrentBrush.Tool);
                 CurrentBrush = new CircularBrush { Radius = (int)CircularBrushRadiusSlider.Value };
+                ImageGrid.Children.Add(CurrentBrush.Tool);
             }
 
             e.Handled = true;
