@@ -8,6 +8,9 @@ namespace GrafikaKomputerowa3.Brushes
 {
     public class CircularBrush : IBrush
     {
+        private bool mouseDown = false;
+        private IFilter? filter = null;
+
         public int Radius;
 
         public Shape Tool { get; } = new Ellipse
@@ -24,6 +27,15 @@ namespace GrafikaKomputerowa3.Brushes
             Tool.Height = 2 * Radius;
             Canvas.SetLeft(Tool, mousePos.X - Radius);
             Canvas.SetTop(Tool, mousePos.Y - Radius);
+
+            if (!mouseDown) return;
+
+            var centerX = (int)mousePos.X;
+            var centerY = (int)mousePos.Y;
+            var startX = (int)(mousePos.X - Radius);
+            var startY = (int)(mousePos.Y - Radius);
+
+            ApplyFilter(centerX, centerY, startX, startY);
         }
 
         public void OnMouseDown(Point mousePos, IFilter filter)
@@ -32,6 +44,22 @@ namespace GrafikaKomputerowa3.Brushes
             var centerY = (int)mousePos.Y;
             var startX = (int)(mousePos.X - Radius);
             var startY = (int)(mousePos.Y - Radius);
+
+            mouseDown = true;
+            this.filter = filter;
+
+            ApplyFilter(centerX, centerY, startX, startY);
+        }
+
+        public void OnMouseUp(Point mousePos, IFilter filter)
+        {
+            mouseDown = false;
+            this.filter = null;
+        }
+
+        private void ApplyFilter(int centerX, int centerY, int startX, int startY)
+        {
+            if (filter is null) return;
 
             try
             {
